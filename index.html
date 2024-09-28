@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Website</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #800000;
+    }
+    header {
+      background-color: #2874f0;
+      padding: 20px;
+      color: red;
+      text-align: center;
+    }
+    header input {
+      width: 60%;
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      font-size: 16px;
+    }
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin: 20px;
+    }
+    .product-item {
+      background: white;
+      width: 23%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      padding: 15px;
+      text-align: center;
+    }
+    .product-item img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .cart {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      background-color: #2874f0;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .cart-items {
+      background: white;
+      padding: 20px;
+      position: fixed;
+      right: 20px;
+      top: 70px;
+      width: 300px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      display: none;
+    }
+    .cart-items h3 {
+      margin: 0 0 10px 0;
+    }
+    .cart-items ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .cart-items ul li {
+      margin-bottom: 10px;
+    }
+    .cart-items ul li span {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Biswajeet Cart</h1>
+    <input type="text" id="search-bar" placeholder="Search for products..." onkeyup="searchProducts()">
+  </header>
+
+  <div class="product-list" id="product-list">
+    <!-- Products will be injected here using JavaScript -->
+  </div>
+
+  <div class="cart" onclick="toggleCart()">
+    Cart (<span id="cart-count">0</span>)
+  </div>
+
+  <div class="cart-items" id="cart-items">
+    <h3>Your Cart</h3>
+    <ul id="cart-list"></ul>
+    <strong>Total: $<span id="total-price">0</span></strong>
+  </div>
+
+  <script>
+    // Example product data
+    const products = [
+      { id: 1, name: "Smartphone", price: 299, image: "https://via.placeholder.com/150" },
+      { id: 2, name: "Laptop", price: 799, image: "https://via.placeholder.com/150" },
+      { id: 3, name: "Headphones", price: 99, image: "https://via.placeholder.com/150" },
+      { id: 4, name: "Camera", price: 499, image: "https://via.placeholder.com/150" },
+      { id: 5, name: "Smartwatch", price: 199, image: "https://via.placeholder.com/150" },
+    ];
+
+    const cart = [];
+    
+    // Render products
+    function renderProducts() {
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = ''; // Clear previous products
+      
+      products.forEach(product => {
+        const productItem = document.createElement('div');
+        productItem.classList.add('product-item');
+        productItem.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>Price: $${product.price}</p>
+          <button onclick="addToCart(${product.id})">Add to Cart</button>
+        `;
+        productList.appendChild(productItem);
+      });
+    }
+
+    // Add to cart function
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      cart.push(product);
+      updateCart();
+    }
+
+    // Update cart UI
+    function updateCart() {
+      const cartCount = document.getElementById('cart-count');
+      const cartList = document.getElementById('cart-list');
+      const totalPrice = document.getElementById('total-price');
+      
+      cartCount.innerText = cart.length; // Update cart count
+      cartList.innerHTML = ''; // Clear previous cart items
+      let total = 0;
+      
+      cart.forEach((item, index) => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          ${item.name} - $${item.price} 
+          <button onclick="removeFromCart(${index})">Remove</button>
+        `;
+        cartList.appendChild(listItem);
+        total += item.price;
+      });
+
+      totalPrice.innerText = total;
+    }
+
+    // Remove from cart function
+    function removeFromCart(index) {
+      cart.splice(index, 1); // Remove item from cart
+      updateCart();
+    }
+
+    // Toggle cart display
+    function toggleCart() {
+      const cartItems = document.getElementById('cart-items');
+      cartItems.style.display = cartItems.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Search products function
+    function searchProducts() {
+      const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+      const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(searchTerm)
+      );
+      renderFilteredProducts(filteredProducts);
+    }
+
+    // Render filtered products
+    function renderFilteredProducts(filteredProducts) {
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = ''; // Clear previous products
+
+      filteredProducts.forEach(product => {
+        const productItem = document.createElement('div');
+        productItem.classList.add('product-item');
+        productItem.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>Price: $${product.price}</p>
+          <button onclick="addToCart(${product.id})">Add to Cart</button>
+        `;
+        productList.appendChild(productItem);
+      });
+    }
+
+    // Initial render of all products
+    renderProducts();
+  </script>
+
+</body>
+</html>
